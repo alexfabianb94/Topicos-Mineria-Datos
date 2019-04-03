@@ -12,21 +12,16 @@ library(gridExtra)
 # Carga de datos  -------------------------------------------------------------------------------------------------------------------
 
 grade=read.csv("../data/grades_km_input.csv",sep = ",",row.names = 1)
-head(grade)
 str(grade)
 summary(grade)
 
 # K Mean ----------------------------------------------------------------------------------------------------------------------------
 
-data_out_kmeans=kmeans(grade,centers=3,nstart = 25)
-data_out_kmeans
-
-centroides=data_out_kmeans$centers#en la variable centroides llamo a centers del cluster anterior
-centroides
-
-distancia_inter_cluster=data_out_kmeans$tot.withinss#distancia entre clusters
-distancia_inter_cluster
-
-plot(grade$English,grade$Science)
-
 wss=numeric(15)
+for (i in 1:15) {
+  data_out_kmeans <- kmeans(grade,centers=i,nstart = 25)
+  wss[i] <- data_out_kmeans$tot.withinss
+}
+
+plot(1:15, wss, "b")
+
