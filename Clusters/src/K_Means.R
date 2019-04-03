@@ -19,6 +19,7 @@ summary(grade)
 
 wss=numeric(15)
 for (i in 1:15) {
+  data_out_kmeans <- kmeans(grade,centers=i,nstart = 25)
   wss[i] <- data_out_kmeans$tot.withinss
 }
 
