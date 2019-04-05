@@ -1,3 +1,5 @@
+# Preparacion -----------------------------------------------------------
+
 # install.packages(c("fastDummies", "dummies", "dplyr"))
 
 val_to_dummy <- function(x){
@@ -6,8 +8,9 @@ val_to_dummy <- function(x){
   } else {
     return(0)
   }
-  
 }
+
+# Lectura de Datos ------------------------------------------------------
 
 BlackFriday <- read.csv("../data/BlackFriday.csv", sep=";", 
                         colClasses = c("integer","character","factor",
@@ -18,7 +21,7 @@ BlackFriday <- read.csv("../data/BlackFriday.csv", sep=";",
 str(BlackFriday)
 clases <- sapply(BlackFriday,class)
 
-
+# Transformacion de DataFrame -------------------------------------------
 dummy <- dummies::dummy.data.frame(BlackFriday, sep = "_",
                                   names = c("Gender", 
                                             "Age", 
@@ -35,6 +38,11 @@ aggregate_data <- cbind(aggregate(. ~ User_ID, test[1:ncol(test) - 1], val_to_du
                         Purchase = aggregate(Purchase ~ User_ID, test, sum)$Purchase)
 
 row.names(aggregate_data) <- aggregate_data$User_ID
+aggregate_data$Purchase <- (aggregate_data$Purchase-min(aggregate_data$Purchase))/
+  (max(aggregate_data$Purchase)-min(aggregate_data$Purchase))
+
+# Evaluacion de Clusters ------------------------------------------------
+
 wss <- numeric(15)
 
 for (k in 1:15){
@@ -43,6 +51,18 @@ for (k in 1:15){
 
 plot(1:15,wss,"b")
 
+# Realizacion de Cluster ------------------------------------------------
+
 ncluster <- 3
-clusters <- kmeans(aggregate_data[2:ncol(aggregate_data)],centers = ncluster)$cluster
-aggregate_data$cluster <- clusters
+clusters <- kmeans(aggregate_data[2:ncol(aggregate_data)],centers = ncluster)
+aggregate_data$cluster <- clusters$cluster
+
+# Grafico Lineas --------------------------------------------------------
+
+inicio <- 1
+fin <- 9
+
+
+plot(x = inicio:fin, y = clusters$centers[1,inicio:fin], type = "b", ylab = "")
+lines(x = inicio:fin, y = clusters$centers[2,inicio:fin], type = "b")
+lines(x = inicio:fin, y = clusters$centers[3,inicio:fin], type = "b")
